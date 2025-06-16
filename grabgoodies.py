@@ -21,11 +21,19 @@ def initialize_enviromentals():
     return [client, secret]
 
 
-# def test_req(key):
-#     print("starting request")
+def grab_OAUTH_cred(client_id, key):
+    data = {
+    'grant_type': 'client_credentials',
+    }
 
-#     print("end request")
-#     return 0
+    response = r.post(
+        'https://oauth.battle.net/token',
+        data=data,
+        auth=(client_id, key),
+    )
+
+    return response
+
 
 
 def main():
@@ -34,8 +42,8 @@ def main():
     client_id = envs[0]
     key = envs[1]
 
-    print("CLIENT == " + client_id)
-    print("SECRET == " + key)
+    resp = grab_OAUTH_cred(client_id, key)
+    
 
 
 if __name__ =="__main__":
