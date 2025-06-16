@@ -29,6 +29,7 @@ def initialize_enviromentals():
 
 
 def main():
+    hostname = "us.api.blizzard.com"
     envs = initialize_enviromentals()
     client_id = envs[0]
     key = envs[1]
