@@ -35,7 +35,6 @@ def grab_OAUTH_cred(client_id, key):
     return response
 
 
-
 def main():
     hostname = "us.api.blizzard.com"
     envs = initialize_enviromentals()
@@ -43,6 +42,9 @@ def main():
     key = envs[1]
 
     resp = grab_OAUTH_cred(client_id, key)
+    access_token = resp.json()['access_token']
+    sub = resp.json()['sub']
+
     
 
 
