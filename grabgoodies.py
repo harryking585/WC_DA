@@ -68,6 +68,7 @@ def get_mythicplus(hostname, access_token):
         print(f'Error has occurred: Unable to receive response from {hostname}profile/wow/character/{realm}/{char_name}/mythic-keystone-profile')
         return 0
     
+    # Grabbing hostname for most recent participated mythic+ season
     char_seasons = response.json()['seasons']
     played_seasons = []
     for x in char_seasons:
@@ -81,7 +82,18 @@ def get_mythicplus(hostname, access_token):
             break
         i+=1
     print(hostname)
-    
+    headers.pop("Battlenet-Namespace")
+    try:
+        response = r.get(
+            hostname,
+            headers=headers
+        )
+    except:
+        print(f'Error has occurred: Unable to receive response from {hostname}profile/wow/character/{realm}/{char_name}/mythic-keystone-profile')
+        return 0
+    print(response.json())
+
+
     return 0
 
 
