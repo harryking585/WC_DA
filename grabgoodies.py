@@ -35,14 +35,13 @@ def grab_OAUTH_cred(client_id, key):
     return response
 
 
-def test_get_call(hostname, client_id, key, access_token):
-    data = {
-        'grant-type': 'client_credentials'
+def test_get_call(hostname, access_token):
+    headers = {
+        'Authorization':f'Bearer {access_token}'
     }
     response = r.get(
         hostname,
-        data=data,
-        auth=(client_id, key)
+        headers=headers
 
     )
 
@@ -51,7 +50,7 @@ def test_get_call(hostname, client_id, key, access_token):
 def main():
     print("****** Starting MAIN ******")
     hostname = "https://us.api.blizzard.com/"
-    append = "data/wow/achievement/index"
+    append = "data/wow/achievement/index?namespace=static-us&locale=en_US"
     hostname += append
 
     envs = initialize_enviromentals()
@@ -63,7 +62,7 @@ def main():
     sub = resp.json()['sub']
     print(f"!OAUTH Credentials Obtained\nACCESS_TOKEN={access_token}\nSUB_TOKEN={sub}")
 
-    test = test_get_call(hostname, client_id, key, access_token)
+    test = test_get_call(hostname, access_token)
 
     print(test)
 
