@@ -26,46 +26,73 @@ def grab_OAUTH_cred(client_id, key):
     'grant_type': 'client_credentials',
     }
 
-    response = r.post(
-        'https://oauth.battle.net/token',
-        data=data,
-        auth=(client_id, key),
-    )
+    try:
+        response = r.post(
+            'https://oauth.battle.net/token',
+            data=data,
+            auth=(client_id, key),
+        )
+    except:
+        print("Error has occurred: Unable to grab OAUTH token from battle.net. Ensure your Client ID and Secret are correct and still active.")
 
     return response
 
 
-def test_get_call(hostname, access_token):
+# def test_get_call(hostname, access_token):
+#     headers = {
+#         'Authorization':f'Bearer {access_token}'
+#     }
+#     response = r.get(
+#         hostname,
+#         headers=headers
+
+#     )
+
+#     return response
+
+def get_mythicplus(hostname, access_token):
+    namespace = "profile-us"
+    realm = "emerald-dream"
+    char_name = "vathren"
     headers = {
-        'Authorization':f'Bearer {access_token}'
+        "Battlenet-Namespace": namespace,
+        "Authorization": f"Bearer {access_token}",
     }
-    response = r.get(
-        hostname,
-        headers=headers
 
-    )
+    try:
+        response = r.get(
+            hostname+f"profile/wow/character/{realm}/{char_name}/mythic-keystone-profile",
+            headers=headers
+        )
+    except:
+        print(f'Error has occurred: Unable to receive response from {hostname}profile/wow/character/{realm}/{char_name}/mythic-keystone-profile')
+        return 0
+    
+    char_seasons = response.json()['seasons']
+    played_seasons = []
+    for x in char_seasons:
+        played_seasons.append(x['id'])
 
-    return response
+    print(played_seasons)
+    return 0
+
 
 def main():
     print("****** Starting MAIN ******")
     hostname = "https://us.api.blizzard.com/"
-    append = "data/wow/achievement/index?namespace=static-us&locale=en_US"
-    hostname += append
+    # append = "data/wow/achievement/index?namespace=static-us&locale=en_US"
+    # hostname += append
 
     envs = initialize_enviromentals()
     client_id = envs[0]
     key = envs[1]
-    print(f"!Client Credentials Obtained\nCLIENT_ID={client_id}\nSECRET={key}")
+
     resp = grab_OAUTH_cred(client_id, key)
     access_token = resp.json()['access_token']
-    sub = resp.json()['sub']
-    print(f"!OAUTH Credentials Obtained\nACCESS_TOKEN={access_token}\nSUB_TOKEN={sub}")
 
-    test = test_get_call(hostname, access_token)
+    print(f"!OAUTH Credentials Obtained")
 
-    print(test)
-
+    get_mythicplus(hostname, access_token)
     print("****** Ending MAIN ******")
 
     
