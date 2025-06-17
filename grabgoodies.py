@@ -72,8 +72,16 @@ def get_mythicplus(hostname, access_token):
     played_seasons = []
     for x in char_seasons:
         played_seasons.append(x['id'])
-
-    print(played_seasons)
+    current_season = max(played_seasons)
+    i = 0
+    hostname = ''
+    while(i < len(char_seasons)):
+        if(char_seasons[i]['id'] == current_season):
+            hostname = char_seasons[i]['key']['href']
+            break
+        i+=1
+    print(hostname)
+    
     return 0
 
 
