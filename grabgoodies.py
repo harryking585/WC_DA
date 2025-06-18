@@ -91,7 +91,12 @@ def get_mythicplus(hostname, access_token):
     except:
         print(f'Error has occurred: Unable to receive response from {hostname}profile/wow/character/{realm}/{char_name}/mythic-keystone-profile')
         return 0
-    print(response.json())
+    
+    
+    mplus_json = response.json()
+    bestrun_df = pd.DataFrame(mplus_json['best_runs'])
+    os.makedirs('WC_DA/testdata', exist_ok=True)
+    bestrun_df.to_csv('WC_DA/testdata/raw_bestruns.csv')
 
 
     return 0
