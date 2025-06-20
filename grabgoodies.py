@@ -98,6 +98,14 @@ def get_mythicplus(hostname, access_token):
     os.makedirs('WC_DA/testdata', exist_ok=True)
     bestrun_df.to_csv('WC_DA/testdata/raw_bestruns.csv')
 
+    '''
+        Multiple attributes we can decide to build tables for...
+            i) All best runs per current weekly affix (IE if affix is void soaks we display all dungeon data where affix = void soaks. {IGNORE FORT AND TYRAN AS BOTH APPLY WITHIN +12})
+                - AFter further consideration there is not affix except fort and tyran in +12 and above keys so this would be useless for players who play above this threshhold
+            ii) Best runs per each dungeon (Say we have Darkflame cleft, display all of our top 10 runs and data associated for those runs)
+            iii) Cross-Seasonal Data Analysis: We can look at the improvements and stack the data against each other for each season the player has ran Mythic+. !!! =< Like uper cool idea
+            iv) 
+    '''
 
     return 0
 
