@@ -7,3 +7,5 @@ For those unfamiliar Mythic+ is an environment where 5 players enter an instance
 the pre-determined timer. The difficulty of the instance grows exponentially as players tackle higher instances.
 
 For example: The difficulty difference between a Mythic+2 and a Mythic+3 is small compared to the difference between a Mythic+4 and a Mythic+5.
+
+Enhancement => Cross-Seasonal Progression. Stack your performance from a season by season basis up against each other to see how much you've improved.
