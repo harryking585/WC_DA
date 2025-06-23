@@ -56,6 +56,13 @@ def check_isJson():
 
 
 def str_to_dict():
+    # lines below here pulling csv are purely for testing purposes
+    os.makedirs('WC_DA/testdata', exist_ok=True)
+    df = pd.read_csv('WC_DA/testdata/raw_best_runs.csv')
+
+    # algo goes here v
+
+
     return 0
 
 
@@ -112,7 +119,7 @@ def get_mythicplus(hostname, access_token):
         if key not in blacklist_attr:
             df.to_csv(f'WC_DA/testdata/raw_{key}.csv')
         
-
+    str_to_dict()
 
 
     return mplus_json
