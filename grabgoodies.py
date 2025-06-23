@@ -50,6 +50,15 @@ def grab_OAUTH_cred(client_id, key):
 
 #     return response
 
+
+def check_isJson():
+    return 0
+
+
+def str_to_dict():
+    return 0
+
+
 def get_mythicplus(hostname, access_token):
     namespace = "profile-us"
     realm = "emerald-dream"
@@ -94,20 +103,19 @@ def get_mythicplus(hostname, access_token):
     
     
     mplus_json = response.json()
-    bestrun_df = pd.DataFrame(mplus_json['best_runs'])
+    # bestrun_df = pd.DataFrame(mplus_json['best_runs'])
     os.makedirs('WC_DA/testdata', exist_ok=True)
-    bestrun_df.to_csv('WC_DA/testdata/raw_bestruns.csv')
+    blacklist_attr = ['_links', 'mythic_rating']
+    # bestrun_df.to_csv('WC_DA/testdata/raw_bestruns.csv')
+    for key in mplus_json.keys():
+        df = pd.DataFrame(mplus_json[key])
+        if key not in blacklist_attr:
+            df.to_csv(f'WC_DA/testdata/raw_{key}.csv')
+        
 
-    '''
-        Multiple attributes we can decide to build tables for...
-            i) All best runs per current weekly affix (IE if affix is void soaks we display all dungeon data where affix = void soaks. {IGNORE FORT AND TYRAN AS BOTH APPLY WITHIN +12})
-                - AFter further consideration there is not affix except fort and tyran in +12 and above keys so this would be useless for players who play above this threshhold
-            ii) Best runs per each dungeon (Say we have Darkflame cleft, display all of our top 10 runs and data associated for those runs)
-            iii) Cross-Seasonal Data Analysis: We can look at the improvements and stack the data against each other for each season the player has ran Mythic+. !!! =< Like uper cool idea
-            iv) 
-    '''
 
-    return 0
+
+    return mplus_json
 
 
 def main():
@@ -125,7 +133,7 @@ def main():
 
     print(f"!OAUTH Credentials Obtained")
 
-    get_mythicplus(hostname, access_token)
+    mp_df = get_mythicplus(hostname, access_token)
     print("****** Ending MAIN ******")
 
     

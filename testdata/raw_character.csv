@@ -1,0 +1,6 @@
+,key,name,id,realm
+href,https://us.api.blizzard.com/profile/wow/character/emerald-dream/vathren?namespace=profile-us,Vathren,200650670,
+key,,Vathren,200650670,{'href': 'https://us.api.blizzard.com/data/wow/realm/162?namespace=dynamic-us'}
+name,,Vathren,200650670,"{'en_US': 'Emerald Dream', 'es_MX': 'Emerald Dream', 'pt_BR': 'Emerald Dream', 'de_DE': 'Emerald Dream', 'en_GB': 'Emerald Dream', 'es_ES': 'Emerald Dream', 'fr_FR': 'Emerald Dream', 'it_IT': 'Emerald Dream', 'ru_RU': 'Emerald Dream', 'ko_KR': 'Emerald Dream', 'zh_TW': '翡翠夢境', 'zh_CN': '翡翠梦境'}"
+id,,Vathren,200650670,162
+slug,,Vathren,200650670,emerald-dream
