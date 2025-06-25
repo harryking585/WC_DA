@@ -2,7 +2,7 @@ import requests as r
 import pandas as pd
 import os
 from pathlib import Path
-
+import json
 
 def initialize_enviromentals():
     # Get path to .env file in parent directory
@@ -55,15 +55,17 @@ def check_isJson():
     return 0
 
 
-def str_to_dict():
-    # lines below here pulling csv are purely for testing purposes
-    os.makedirs('WC_DA/testdata', exist_ok=True)
-    df = pd.read_csv('WC_DA/testdata/raw_best_runs.csv')
+# Takes unformatted_str and casts it to a dictionary using the json library. If casting fails returns -1
+def str_to_dict(unformatted_str):
+    formatted_str = unformatted_str.replace('\'', '\"')
 
-    # algo goes here v
-
-
-    return 0
+    try:
+        json_dict = json.loads(formatted_str)
+    except:
+        print("ERROR: String does not fully represent a dictionary")
+        return -1
+    
+    return json_dict
 
 
 def get_mythicplus(hostname, access_token):
@@ -81,7 +83,7 @@ def get_mythicplus(hostname, access_token):
             headers=headers
         )
     except:
-        print(f'Error has occurred: Unable to receive response from {hostname}profile/wow/character/{realm}/{char_name}/mythic-keystone-profile')
+        print(f'ERROR: Unable to receive response from {hostname}profile/wow/character/{realm}/{char_name}/mythic-keystone-profile')
         return 0
     
     # Grabbing hostname for most recent participated mythic+ season
@@ -105,7 +107,7 @@ def get_mythicplus(hostname, access_token):
             headers=headers
         )
     except:
-        print(f'Error has occurred: Unable to receive response from {hostname}profile/wow/character/{realm}/{char_name}/mythic-keystone-profile')
+        print(f'ERROR: Unable to receive response from {hostname}profile/wow/character/{realm}/{char_name}/mythic-keystone-profile')
         return 0
     
     
