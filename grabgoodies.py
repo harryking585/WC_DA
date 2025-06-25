@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import json
 
+
 def initialize_enviromentals():
     # Get path to .env file in parent directory
     env_path = Path(__file__).resolve().parent.parent / ".env"
@@ -51,23 +52,27 @@ def grab_OAUTH_cred(client_id, key):
 #     return response
 
 
-def check_isJson():
+# checks a str to see if it can be converted to a dict
+def check_isJson(p_str):
     return 0
 
 
-# Takes unformatted_str and casts it to a dictionary using the json library. If casting fails returns -1
+# Takes unformatted_str and casts it to a dictionary using the json library
+# @return => python dictionary || None
 def str_to_dict(unformatted_str):
     formatted_str = unformatted_str.replace('\'', '\"')
 
     try:
         json_dict = json.loads(formatted_str)
     except:
-        print("ERROR: String does not fully represent a dictionary")
-        return -1
+        print("ERROR: String does not fully represent a dictionary, assumming type 'None'")
+        return None
     
     return json_dict
 
 
+# Calls the mythic plus blizzard endpoint and formats the dataframe to ideal working state
+# @return => dataframe || -1
 def get_mythicplus(hostname, access_token):
     namespace = "profile-us"
     realm = "emerald-dream"
@@ -84,7 +89,7 @@ def get_mythicplus(hostname, access_token):
         )
     except:
         print(f'ERROR: Unable to receive response from {hostname}profile/wow/character/{realm}/{char_name}/mythic-keystone-profile')
-        return 0
+        return -1
     
     # Grabbing hostname for most recent participated mythic+ season
     char_seasons = response.json()['seasons']
@@ -108,7 +113,7 @@ def get_mythicplus(hostname, access_token):
         )
     except:
         print(f'ERROR: Unable to receive response from {hostname}profile/wow/character/{realm}/{char_name}/mythic-keystone-profile')
-        return 0
+        return -1
     
     
     mplus_json = response.json()
@@ -117,16 +122,16 @@ def get_mythicplus(hostname, access_token):
     blacklist_attr = ['_links', 'mythic_rating']
     # bestrun_df.to_csv('WC_DA/testdata/raw_bestruns.csv')
     for key in mplus_json.keys():
-        df = pd.DataFrame(mplus_json[key])
+        df = pd.DataFrame(mplus_json[key], index_col = 0)
         if key not in blacklist_attr:
             df.to_csv(f'WC_DA/testdata/raw_{key}.csv')
-        
-    str_to_dict()
 
 
     return mplus_json
 
 
+# Main function
+# @return => 0
 def main():
     print("****** Starting MAIN ******")
     hostname = "https://us.api.blizzard.com/"
