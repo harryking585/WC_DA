@@ -130,6 +130,19 @@ def get_mythicplus(hostname, access_token):
     return mplus_json
 
 
+# Calls the Blizzard Achievements endpoint 
+# @return ; nil; pandas.DataFrame
+def getAchievements(namespace, access_token):
+
+    headers = {
+        "Battlenet-Namespace": namespace,
+        "Authorization": f"Bearer {access_token}",
+    }
+    endpoint = ''
+
+    return 0 
+
+
 # Main function
 # @return => 0
 def main():
