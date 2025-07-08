@@ -75,8 +75,8 @@ def str_to_dict(unformatted_str):
 # @return => dataframe || -1
 def get_mythicplus(hostname, access_token):
     namespace = "profile-us"
-    realm = "emerald-dream"
-    char_name = "vathren"
+    realm = "emerald-dream" # test realm
+    char_name = "vathren" # test acc
     headers = {
         "Battlenet-Namespace": namespace,
         "Authorization": f"Bearer {access_token}",
