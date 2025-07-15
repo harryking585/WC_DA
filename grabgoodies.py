@@ -3,9 +3,11 @@ import pandas as pd
 import os
 from pathlib import Path
 import json
+from fastapi import FastAPI, HTTPException, Query
+from typing import Optional
+app = FastAPI()
 
-
-def initialize_enviromentals():
+def initialize_environmentals():
     # Get path to .env file in parent directory
     env_path = Path(__file__).resolve().parent.parent / ".env"
 
@@ -70,6 +72,8 @@ def str_to_dict(unformatted_str):
     
     return json_dict
 
+
+    
 
 # Calls the mythic plus blizzard endpoint and formats the dataframe to ideal working state
 # @return => dataframe || -1
@@ -151,7 +155,7 @@ def main():
     # append = "data/wow/achievement/index?namespace=static-us&locale=en_US"
     # hostname += append
 
-    envs = initialize_enviromentals()
+    envs = initialize_environmentals()
     client_id = envs[0]
     key = envs[1]
 
@@ -165,6 +169,23 @@ def main():
 
     
 
+# === FastAPI Endpoints ===
 
-if __name__ =="__main__":
-    main()
+@app.get("/")
+def root():
+    return {"status": "API is running"}
+
+@app.get("/mythicplus")
+def fetch_mythicplus(
+    realm: str = Query("emerald-dream"),
+    character: str = Query("vathren")
+):
+    try:
+        client_id, secret = initialize_environmentals()
+        token = grab_OAUTH_cred(client_id, secret)
+        hostname = "https://us.api.blizzard.com/"
+        data = get_mythicplus(hostname, token, realm=realm, char_name=character)
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
