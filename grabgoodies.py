@@ -100,7 +100,7 @@ def get_mythicplus(hostname, access_token):
     played_seasons = []
     for x in char_seasons:
         played_seasons.append(x['id'])
-    current_season = max(played_seasons)
+    current_season = max(played_seasons)-1
     i = 0
     hostname = ''
     while(i < len(char_seasons)):
@@ -126,7 +126,7 @@ def get_mythicplus(hostname, access_token):
     blacklist_attr = ['_links', 'mythic_rating']
     # bestrun_df.to_csv('WC_DA/testdata/raw_bestruns.csv')
     for key in mplus_json.keys():
-        df = pd.DataFrame(mplus_json[key], index_col = 0)
+        df = pd.DataFrame(mplus_json[key])
         if key not in blacklist_attr:
             df.to_csv(f'WC_DA/testdata/raw_{key}.csv')
 
@@ -147,28 +147,6 @@ def getAchievements(namespace, access_token):
     return 0 
 
 
-# Main function
-# @return => 0
-def main():
-    print("****** Starting MAIN ******")
-    hostname = "https://us.api.blizzard.com/"
-    # append = "data/wow/achievement/index?namespace=static-us&locale=en_US"
-    # hostname += append
-
-    envs = initialize_environmentals()
-    client_id = envs[0]
-    key = envs[1]
-
-    resp = grab_OAUTH_cred(client_id, key)
-    access_token = resp.json()['access_token']
-
-    print(f"!OAUTH Credentials Obtained")
-
-    mp_df = get_mythicplus(hostname, access_token)
-    print("****** Ending MAIN ******")
-
-    
-
 # === FastAPI Endpoints ===
 
 @app.get("/")
@@ -176,16 +154,22 @@ def root():
     return {"status": "API is running"}
 
 @app.get("/mythicplus")
-def fetch_mythicplus(
-    realm: str = Query("emerald-dream"),
-    character: str = Query("vathren")
-):
+def fetch_mythicplus():
     try:
-        client_id, secret = initialize_environmentals()
-        token = grab_OAUTH_cred(client_id, secret)
         hostname = "https://us.api.blizzard.com/"
-        data = get_mythicplus(hostname, token, realm=realm, char_name=character)
-        return data
+        # append = "data/wow/achievement/index?namespace=static-us&locale=en_US"
+        # hostname += append
+
+        envs = initialize_environmentals()
+        client_id = envs[0]
+        key = envs[1]
+
+        resp = grab_OAUTH_cred(client_id, key)
+        access_token = resp.json()['access_token']
+
+        print(f"!OAUTH Credentials Obtained")
+
+        return get_mythicplus(hostname, access_token)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
