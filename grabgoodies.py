@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from pathlib import Path
 import json
+from json import loads, dumps
 from fastapi import FastAPI, HTTPException, Query
 from typing import Optional
 app = FastAPI()
@@ -78,6 +79,7 @@ def str_to_dict(unformatted_str):
 # Calls the mythic plus blizzard endpoint and formats the dataframe to ideal working state
 # @return => dataframe || -1
 def get_mythicplus(hostname, access_token):
+    df_list = ['hee']
     namespace = "profile-us"
     realm = "emerald-dream" # test realm
     char_name = "vathren" # test acc
@@ -123,15 +125,19 @@ def get_mythicplus(hostname, access_token):
     mplus_json = response.json()
     # bestrun_df = pd.DataFrame(mplus_json['best_runs'])
     os.makedirs('WC_DA/testdata', exist_ok=True)
-    blacklist_attr = ['_links', 'mythic_rating']
+    blacklist_attr = ['_links', 'mythic_rating', 'character']
     # bestrun_df.to_csv('WC_DA/testdata/raw_bestruns.csv')
     for key in mplus_json.keys():
         df = pd.DataFrame(mplus_json[key])
         if key not in blacklist_attr:
+            res = df.to_json(orient="split")
+            parsed_df = loads(res)
+            dfjson = dumps(parsed_df, indent=4)
+            df_list.append(dfjson)
             df.to_csv(f'WC_DA/testdata/raw_{key}.csv')
+            
 
-
-    return mplus_json
+    return df_list
 
 
 # Calls the Blizzard Achievements endpoint 
@@ -145,7 +151,6 @@ def getAchievements(namespace, access_token):
     endpoint = ''
 
     return 0 
-
 
 # === FastAPI Endpoints ===
 
