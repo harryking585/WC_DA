@@ -42,19 +42,6 @@ def grab_OAUTH_cred(client_id, key):
     return response
 
 
-# def test_get_call(hostname, access_token):
-#     headers = {
-#         'Authorization':f'Bearer {access_token}'
-#     }
-#     response = r.get(
-#         hostname,
-#         headers=headers
-
-#     )
-
-#     return response
-
-
 # checks a str to see if it can be converted to a dict
 def check_isJson(p_str):
     return 0
@@ -78,11 +65,9 @@ def str_to_dict(unformatted_str):
 
 # Calls the mythic plus blizzard endpoint and formats the dataframe to ideal working state
 # @return => dataframe || -1
-def get_mythicplus(hostname, access_token):
+def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vathren"):
     df_list = ['hee']
     namespace = "profile-us"
-    realm = "emerald-dream" # test realm
-    char_name = "vathren" # test acc
     headers = {
         "Battlenet-Namespace": namespace,
         "Authorization": f"Bearer {access_token}",
@@ -154,17 +139,16 @@ def getAchievements(namespace, access_token):
 
 # === FastAPI Endpoints ===
 
+
 @app.get("/")
-def root():
+async def root():
     return {"status": "API is running"}
 
-@app.get("/mythicplus")
-def fetch_mythicplus():
+
+@app.get("/static_mythicplus")
+async def get_staticmythicplus():
     try:
         hostname = "https://us.api.blizzard.com/"
-        # append = "data/wow/achievement/index?namespace=static-us&locale=en_US"
-        # hostname += append
-
         envs = initialize_environmentals()
         client_id = envs[0]
         key = envs[1]
@@ -177,4 +161,19 @@ def fetch_mythicplus():
         return get_mythicplus(hostname, access_token)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
 
+@app.get("/dynamic_mythicplus/{realm}/{name}")
+async def get_dynamicmythicplus(realm, name):
+    try:
+        hostname = "https://us.api.blizzard.com/"
+        envs = initialize_environmentals()
+        client_id = envs[0]
+        key = envs[1]
+
+        resp = grab_OAUTH_cred(client_id, key)
+        access_token = resp.json()['access_token']
+        
+        return get_mythicplus(hostname, access_token, realm, name)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
