@@ -61,12 +61,18 @@ def str_to_dict(unformatted_str):
     return json_dict
 
 
+def dfs_dataframe(dataframe, adj_li, visit_li):
+    node_stack = []
+    keys = list(dataframe.keys())
+
+
+    return dataframe
     
 
 # Calls the mythic plus blizzard endpoint and formats the dataframe to ideal working state
 # @return => dataframe || -1
 def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vathren"):
-    df_list = ['hee']
+    df_list = []
     namespace = "profile-us"
     headers = {
         "Battlenet-Namespace": namespace,
@@ -115,10 +121,11 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
     for key in mplus_json.keys():
         df = pd.DataFrame(mplus_json[key])
         if key not in blacklist_attr:
-            res = df.to_json(orient="split")
-            parsed_df = loads(res)
-            dfjson = dumps(parsed_df, indent=4)
-            df_list.append(dfjson)
+            df = dfs_dataframe(df)
+            res = df.to_json()
+            #parsed_df = loads(res)
+            #dfjson = dumps(parsed_df, indent=4)
+            df_list.append(res)
             df.to_csv(f'WC_DA/testdata/raw_{key}.csv')
             
 
@@ -138,7 +145,6 @@ def getAchievements(namespace, access_token):
     return 0 
 
 # === FastAPI Endpoints ===
-
 
 @app.get("/")
 async def root():
@@ -177,3 +183,16 @@ async def get_dynamicmythicplus(realm, name):
         return get_mythicplus(hostname, access_token, realm, name)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# Purely for debugging purposes
+# hostname = "https://us.api.blizzard.com/"
+# envs = initialize_environmentals()
+# client_id = envs[0]
+# key = envs[1]
+# resp = grab_OAUTH_cred(client_id, key)
+# access_token = resp.json()['access_token']
+
+# print(f"!OAUTH Credentials Obtained")
+
+# get_mythicplus(hostname, access_token)
