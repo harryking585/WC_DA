@@ -58,12 +58,51 @@ def str_to_dict(unformatted_str):
         print("ERROR: String does not fully represent a dictionary, assumming type 'None'")
         return None
     
+    
     return json_dict
+
+def end_kvpair_index(key, strrow, start_index):
+    flags = 3 # indx0 = : encountered, indx1 = '1 encountered, indx2 = '2 encountered
+    start_index += 7
+    while(flags > 0):
+        char = strrow[start_index]
+
+        if(flags == 3 and char is ":"):
+            flags-=1
+        elif(flags <= 2 and char is "'"):
+            flags -=1
+
+        start_index += 1
+    
+    return start_index
+
 
 
 def dfs_dataframe(dataframe, adj_li, visit_li):
-    node_stack = []
     keys = list(dataframe.keys())
+    # need to store key context when traversing tree
+    for i in keys:
+        us_start, us_stop, cn_start, cn_stop = 0
+        element_type = type(dataframe[i][0])
+
+        if(element_type is (dict or list)):   
+            for j in range(0, len(dataframe[i])):
+                strcast_row = str(dataframe[i][j])
+                if("'en_US'" in strcast_row):
+                    for k in range(0, strcast_row.count("'en_US'")):
+                        us_start = strcast_row.find("'en_US'")
+                        cn_start = strcast_row.find("'zh_CN'")
+                        
+                        us_stop = end_kvpair_index("'en_US'", strcast_row, us_start)
+                        cn_stop = end_kvpair_index("'zh_CN'", strcast_row, cn_start)
+
+
+                else:
+                     break
+        else:
+            continue
+            
+
 
 
     return dataframe
