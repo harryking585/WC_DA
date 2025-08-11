@@ -87,12 +87,11 @@ def dfs_dataframe(dataframe):
         cn_start = 0
         cn_stop = 0
         element_type = type(dataframe[i][0])
-
-        if(element_type is (dict or list)):   
-            for j in range(0, len(dataframe[i])):
+        if(element_type is (dict or list)):   # only checks if its a dict ((dict or list) returns dict) need to make it check for both
+            for j in range(0, len(dataframe[i])): 
                 strcast_row = str(dataframe[i][j])
                 if("'en_US'" in strcast_row):
-                    for k in range(0, strcast_row.count("'en_US'")):
+                    for k in range(0, strcast_row.count("'en_US'")): # need to change this to a while loop as well as a way to make sure we blacklist multiples of en_US
                         us_start = strcast_row.find("'en_US'")
                         cn_start = strcast_row.find("'zh_CN'")
                         
@@ -230,13 +229,13 @@ async def get_dynamicmythicplus(realm, name):
 
 
 # Purely for debugging purposes
-# hostname = "https://us.api.blizzard.com/"
-# envs = initialize_environmentals()
-# client_id = envs[0]
-# key = envs[1]
-# resp = grab_OAUTH_cred(client_id, key)
-# access_token = resp.json()['access_token']
+hostname = "https://us.api.blizzard.com/"
+envs = initialize_environmentals()
+client_id = envs[0]
+key = envs[1]
+resp = grab_OAUTH_cred(client_id, key)
+access_token = resp.json()['access_token']
 
-# print(f"!OAUTH Credentials Obtained")
+print(f"!OAUTH Credentials Obtained")
 
-# get_mythicplus(hostname, access_token)
+get_mythicplus(hostname, access_token)
