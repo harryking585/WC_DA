@@ -61,7 +61,7 @@ def str_to_dict(unformatted_str):
     
     return json_dict
 
-def end_kvpair_index(key, strrow, start_index):
+def end_kvpair_index(strrow, start_index):
     flags = 3 # indx0 = : encountered, indx1 = '1 encountered, indx2 = '2 encountered
     start_index += 7
     while(flags > 0):
@@ -78,11 +78,14 @@ def end_kvpair_index(key, strrow, start_index):
 
 
 
-def dfs_dataframe(dataframe, adj_li, visit_li):
+def dfs_dataframe(dataframe):
     keys = list(dataframe.keys())
     # need to store key context when traversing tree
     for i in keys:
-        us_start, us_stop, cn_start, cn_stop = 0
+        us_start = 0
+        us_stop = 0
+        cn_start = 0
+        cn_stop = 0
         element_type = type(dataframe[i][0])
 
         if(element_type is (dict or list)):   
@@ -93,9 +96,11 @@ def dfs_dataframe(dataframe, adj_li, visit_li):
                         us_start = strcast_row.find("'en_US'")
                         cn_start = strcast_row.find("'zh_CN'")
                         
-                        us_stop = end_kvpair_index("'en_US'", strcast_row, us_start)
-                        cn_stop = end_kvpair_index("'zh_CN'", strcast_row, cn_start)
-
+                        us_stop = end_kvpair_index(strcast_row, us_start)
+                        cn_stop = end_kvpair_index(strcast_row, cn_start)
+                        
+                        strcast_row = strcast_row[0:us_stop] + strcast_row[cn_stop:len(strcast_row)]
+                        dataframe[i][j] = str_to_dict(strcast_row)
 
                 else:
                      break
