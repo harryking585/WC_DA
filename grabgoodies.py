@@ -136,7 +136,8 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
     played_seasons = []
     for x in char_seasons:
         played_seasons.append(x['id'])
-    current_season = max(played_seasons)-1
+    current_season = max(played_seasons)
+    print(f"\n\nseasons list = {played_seasons}\n\n")
     i = 0
     hostname = ''
     while(i < len(char_seasons)):
@@ -183,8 +184,9 @@ def getAchievements(namespace, access_token):
         "Battlenet-Namespace": namespace,
         "Authorization": f"Bearer {access_token}",
     }
-    endpoint = ''
-
+    endpoint = '/achievements'
+    
+    blacklist_attr=[]
     return 0 
 
 # === FastAPI Endpoints ===
@@ -194,25 +196,7 @@ async def root():
     return {"status": "API is running"}
 
 
-@app.get("/static_mythicplus")
-async def get_staticmythicplus():
-    try:
-        hostname = "https://us.api.blizzard.com/"
-        envs = initialize_environmentals()
-        client_id = envs[0]
-        key = envs[1]
-
-        resp = grab_OAUTH_cred(client_id, key)
-        access_token = resp.json()['access_token']
-
-        print(f"!OAUTH Credentials Obtained")
-
-        return get_mythicplus(hostname, access_token)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-
-@app.get("/dynamic_mythicplus/{realm}/{name}")
+@app.get("/bestruns/{realm}/{name}")
 async def get_dynamicmythicplus(realm, name):
     try:
         hostname = "https://us.api.blizzard.com/"
@@ -222,7 +206,7 @@ async def get_dynamicmythicplus(realm, name):
 
         resp = grab_OAUTH_cred(client_id, key)
         access_token = resp.json()['access_token']
-        
+    
         return get_mythicplus(hostname, access_token, realm, name)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
