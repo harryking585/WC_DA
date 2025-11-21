@@ -73,7 +73,6 @@ def end_kvpair_index(strrow, start_index):
             flags -=1
 
         start_index += 1
-    
     return start_index
 
 
@@ -136,7 +135,7 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
     played_seasons = []
     for x in char_seasons:
         played_seasons.append(x['id'])
-    current_season = max(played_seasons)
+    current_season = max(played_seasons)-2
     print(f"\n\nseasons list = {played_seasons}\n\n")
     i = 0
     hostname = ''
