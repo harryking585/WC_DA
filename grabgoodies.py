@@ -5,8 +5,18 @@ from pathlib import Path
 import json
 from json import loads, dumps
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def initialize_environmentals():
     # Get path to .env file in parent directory
