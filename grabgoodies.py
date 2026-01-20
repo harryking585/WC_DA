@@ -220,7 +220,32 @@ async def get_dynamicmythicplus(realm, name):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# returns a list of all available realms
+@app.get("/realms")
+async def get_realms():
+    hostname = "https://us.api.blizzard.com"
+    envs = initialize_environmentals()
+    client_id = envs[0]
+    key = envs[1]
 
+    resp = grab_OAUTH_cred(client_id, key)
+    access_token = resp.json()['access_token']
+    namespace = "profile-us"
+    headers = {
+        "Battlenet-Namespace": namespace,
+        "Authorization": f"Bearer {access_token}",
+    }
+
+    try:
+        response = r.get(
+            hostname+"/data/wow/realm/index",
+            headers
+        )
+        
+
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 # Purely for debugging purposes
 # hostname = "https://us.api.blizzard.com/"
 # envs = initialize_environmentals()
@@ -232,3 +257,28 @@ async def get_dynamicmythicplus(realm, name):
 # print(f"!OAUTH Credentials Obtained")
 
 # get_mythicplus(hostname, access_token)
+
+
+# ******** REALMS API CALL TESTING (SEQUENTIAL) ********
+# hostname = "https://us.api.blizzard.com/"
+# envs = initialize_environmentals()
+# client_id = envs[0]
+# key = envs[1]
+
+# resp = grab_OAUTH_cred(client_id, key)
+# access_token = resp.json()['access_token']
+# namespace = "dynamic-us"
+# headers = {
+#     "Battlenet-Namespace": namespace,
+#     "Authorization": f"Bearer {access_token}",
+# }
+
+# try:
+#     response = r.get(
+#         hostname+"data/wow/realm/index",
+#         headers
+#     )
+        
+#     print("complete")
+# except Exception as e:
+#     raise HTTPException(status_code=500, detail=str(e))
