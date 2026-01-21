@@ -7,6 +7,7 @@ from json import loads, dumps
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
+import regex as re
 app = FastAPI()
 
 
@@ -178,6 +179,10 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
             res = df.to_json()
             #parsed_df = loads(res)
             #dfjson = dumps(parsed_df, indent=4)
+
+            #test regex expression
+            res = re.find("[^(\\)]")
+            #end regex expression
             df_list.append(res)
             df.to_csv(f'WC_DA/testdata/raw_{key}.csv')
             
