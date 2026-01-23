@@ -7,7 +7,7 @@ from json import loads, dumps
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
-import regex as re
+import re
 app = FastAPI()
 
 
@@ -181,7 +181,7 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
             #dfjson = dumps(parsed_df, indent=4)
 
             #test regex expression
-            res = re.find("[^(\\)]")
+            # res = re.find("[^(\\)]")
             #end regex expression
             df_list.append(res)
             df.to_csv(f'WC_DA/testdata/raw_{key}.csv')
@@ -221,7 +221,7 @@ async def get_dynamicmythicplus(realm, name):
         resp = grab_OAUTH_cred(client_id, key)
         access_token = resp.json()['access_token']
     
-        return get_mythicplus(hostname, access_token, realm, name)
+        return get_mythicplus(hostname, access_token, realm.lower(), name.lower())
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
