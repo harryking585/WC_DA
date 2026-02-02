@@ -1,29 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>WC_DA</title>
+  <meta charset="UTF-8" />
+  <title>WC_DA – Mythic+ Best Runs</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>WC_DA</h1>
+  <main class="container">
+    <header>
+      <h1>WC_DA</h1>
+      <p class="subtitle">
+        World of Warcraft Mythic+ Best Run Analyzer
+      </p>
+    </header>
 
-  <form id="apiForm">
-    <label>
-      Realm:
-      <input type="text" id="realm" required>
-    </label>
-    <br><br>
+    <section class="card">
+      <form id="apiForm">
+        <div class="form-group">
+          <label for="realm">Realm</label>
+          <input type="text" id="realm" placeholder="ex: dalaran" required />
+        </div>
 
-    <label>
-      Character Name:
-      <input type="text" id="name" required>
-    </label>
-    <br><br>
+        <div class="form-group">
+          <label for="name">Character Name</label>
+          <input type="text" id="name" placeholder="ex: Drchocolate" required />
+        </div>
 
-    <button type="submit">Send to API</button>
-  </form>
+        <button type="submit">Fetch Best Runs</button>
+      </form>
+    </section>
 
-  <pre id="response"></pre>
+    <section id="response" class="response"></section>
+  </main>
 
   <script src="app.js"></script>
 </body>
