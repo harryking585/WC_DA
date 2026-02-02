@@ -68,11 +68,6 @@ button:hover {
   background: #1d4ed8;
 }
 
-.results {
-  display: grid;
-  gap: 1rem;
-}
-
 .run-card {
   background: #020617;
   padding: 1rem;
