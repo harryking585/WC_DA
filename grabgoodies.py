@@ -122,6 +122,46 @@ def dfs_dataframe(dataframe):
     return dataframe
     
 
+def get_dungeonpool(hostname, access_token):
+    dungeon_pool = []
+    namespace = "dynamic-us"
+    headers = {
+        "Battlenet-Namespace": namespace,
+        "Authorization": f"Bearer {access_token}",
+    }
+    operations = 0
+    try:
+        response = r.get(
+            hostname+"data/wow/mythic-keystone/dungeon/index",
+            headers=headers
+        )
+    except:
+        print(f"Error: Unable to receive response from {hostname}data/wow/mythic-keystone/dungeon/index")
+        return -1
+    
+    exhaustive_dungeons = response.json()["dungeons"]
+
+    for x in exhaustive_dungeons[::-1]:
+        try:
+            response = r.get(
+                hostname+f"data/wow/mythic-keystone/dungeon/{x["id"]}",
+                headers=headers
+            )
+            operations += 1
+            iter_dung = response.json()
+            if iter_dung["is_tracked"]:
+                dungeon_pool.append(iter_dung)
+            
+            if len(dungeon_pool) > 7:
+                break
+        except:
+            print(operations)
+            print(f"Error: Unable to receive response from {hostname}data/wow/mythic-keystone/dungeon/{x["id"]}")
+            return -1
+    return dungeon_pool
+
+
+
 # Calls the mythic plus blizzard endpoint and formats the dataframe to ideal working state
 # @return => dataframe || -1
 def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vathren"):
@@ -146,7 +186,7 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
     played_seasons = []
     for x in char_seasons:
         played_seasons.append(x['id'])
-    current_season = max(played_seasons)-2
+    current_season = max(played_seasons)
     print(f"\n\nseasons list = {played_seasons}\n\n")
     i = 0
     hostname = ''
@@ -251,18 +291,19 @@ async def get_realms():
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
 # Purely for debugging purposes
-# hostname = "https://us.api.blizzard.com/"
-# envs = initialize_environmentals()
-# client_id = envs[0]
-# key = envs[1]
-# resp = grab_OAUTH_cred(client_id, key)
-# access_token = resp.json()['access_token']
+hostname = "https://us.api.blizzard.com/"
+envs = initialize_environmentals()
+client_id = envs[0]
+key = envs[1]
+resp = grab_OAUTH_cred(client_id, key)
+access_token = resp.json()['access_token']
 
-# print(f"!OAUTH Credentials Obtained")
+print(f"!OAUTH Credentials Obtained")
 
-# get_mythicplus(hostname, access_token)
-
+get_dungeonpool(hostname, access_token)
+print("woopa")
 
 # ******** REALMS API CALL TESTING (SEQUENTIAL) ********
 # hostname = "https://us.api.blizzard.com/"
