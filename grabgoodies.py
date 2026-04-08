@@ -261,11 +261,28 @@ async def get_dynamicmythicplus(realm, name):
         resp = grab_OAUTH_cred(client_id, key)
         access_token = resp.json()['access_token']
     
-        return get_mythicplus(hostname, access_token, realm.lower(), name.lower())
+        return json.dumps(get_mythicplus(hostname, access_token, realm.lower(), name.lower()))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@app.get("/dungeonpool")
+async def get_seasondungeons():
+    try:
+        hostname = "https://us.api.blizzard.com/"
+        envs = initialize_environmentals()
+        client_id = envs[0]
+        key = envs[1]
+
+        resp = grab_OAUTH_cred(client_id, key)
+        access_token = resp.json()["access_token"]
+
+        return get_dungeonpool(hostname, access_token)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 # returns a list of all available realms
+
+
 @app.get("/realms")
 async def get_realms():
     hostname = "https://us.api.blizzard.com"
@@ -293,19 +310,19 @@ async def get_realms():
         raise HTTPException(status_code=500, detail=str(e))
     
 # Purely for debugging purposes
-hostname = "https://us.api.blizzard.com/"
-envs = initialize_environmentals()
-client_id = envs[0]
-key = envs[1]
-resp = grab_OAUTH_cred(client_id, key)
-access_token = resp.json()['access_token']
+# hostname = "https://us.api.blizzard.com/"
+# envs = initialize_environmentals()
+# client_id = envs[0]
+# key = envs[1]
+# resp = grab_OAUTH_cred(client_id, key)
+# access_token = resp.json()['access_token']
 
-print(f"!OAUTH Credentials Obtained")
+# print(f"!OAUTH Credentials Obtained")
 
-get_dungeonpool(hostname, access_token)
-print("woopa")
+# get_dungeonpool(hostname, access_token)
+# print("woopa")
 
-# ******** REALMS API CALL TESTING (SEQUENTIAL) ********
+# # ******** REALMS API CALL TESTING (SEQUENTIAL) ********
 # hostname = "https://us.api.blizzard.com/"
 # envs = initialize_environmentals()
 # client_id = envs[0]
