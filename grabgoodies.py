@@ -53,11 +53,6 @@ def grab_OAUTH_cred(client_id, key):
     return response
 
 
-# checks a str to see if it can be converted to a dict
-def check_isJson(p_str):
-    return 0
-
-
 # Takes unformatted_str and casts it to a dictionary using the json library
 # @return => python dictionary || None
 def str_to_dict(unformatted_str):
@@ -141,7 +136,7 @@ def get_dungeonpool(hostname, access_token):
     
     exhaustive_dungeons = response.json()["dungeons"]
 
-    for x in exhaustive_dungeons[::-1]:
+    for x in exhaustive_dungeons[::-1]: # older mythic+ dungeons appear first in list hence iterating backwards
         try:
             response = r.get(
                 hostname+f"data/wow/mythic-keystone/dungeon/{x["id"]}",
@@ -226,8 +221,8 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
             df_list.append(res)
             df.to_csv(f'WC_DA/testdata/raw_{key}.csv')
             
-
-    return df_list
+    print(type(mplus_json))
+    return mplus_json
 
 
 # Calls the Blizzard Achievements endpoint 
