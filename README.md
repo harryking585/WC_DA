@@ -10,7 +10,7 @@ response into concise, useful information for an end user.
 
 ## Demo
 
-![WC_DA Demo](assets/wc_da_demo.gif)
+![WC_DA Demo](./assets/wc_da_demo.gif)
 
 **Character lookup → backend data transformation → calculated
 performance metrics → individual run details**
