@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000/";
+const API_BASE_URL = "http://127.0.0.1:8000";
 
 function createTable(headers, rows) {
   const table = document.createElement("table");
@@ -96,21 +96,37 @@ function renderBestRuns(data) {
     "Level",
     "Completed",
     "Duration (min)",
-    "Affixes",
-    "Members"
+    "Details"
   ];
 
   const mainRows = runs.map(run => {
-    const completed = run.completed_within_time ? "Yes" : "No";
+    const completed = document.createElement("span");
+    completed.textContent = run.completed_within_time ? "Yes" : "No";
+    completed.className = run.completed_within_time
+      ? "status-success"
+      : "status-fail";
 
-    // Affixes table
-    const affixRows = run.affixes.map(affix => [
-      affix
-    ]);
+    const detailsButton = document.createElement("button");
+    detailsButton.type = "button";
+    detailsButton.textContent = "View Details";
 
-    const affixTable = createTable(["Affix"], affixRows);
+    const detailsContainer = document.createElement("div");
+    detailsContainer.hidden = true;
 
-    // Members table
+    const affixHeading = document.createElement("h3");
+    affixHeading.textContent = "Affixes";
+
+    const affixList = document.createElement("ul");
+
+    run.affixes.forEach(affix => {
+      const item = document.createElement("li");
+      item.textContent = affix;
+      affixList.appendChild(item);
+    });
+
+    const memberHeading = document.createElement("h3");
+    memberHeading.textContent = "Party Members";
+
     const memberRows = run.members.map(member => [
       member.name,
       member.realm,
@@ -124,13 +140,27 @@ function renderBestRuns(data) {
       memberRows
     );
 
+    detailsContainer.appendChild(affixHeading);
+    detailsContainer.appendChild(affixList);
+    detailsContainer.appendChild(memberHeading);
+    detailsContainer.appendChild(memberTable);
+
+    detailsButton.addEventListener("click", () => {
+      detailsContainer.hidden = !detailsContainer.hidden;
+      detailsButton.textContent =
+        detailsContainer.hidden ? "View Details" : "Hide Details";
+    });
+
+    const detailsWrapper = document.createElement("div");
+    detailsWrapper.appendChild(detailsButton);
+    detailsWrapper.appendChild(detailsContainer);
+
     return [
       run.dungeon,
       run.keystone_level,
       completed,
       run.duration_minutes.toFixed(2),
-      affixTable,
-      memberTable
+      detailsWrapper
     ];
   });
 
@@ -144,7 +174,7 @@ document.getElementById("apiForm").addEventListener("submit", function (event) {
   const realm = document.getElementById("realm").value;
   const name = document.getElementById("name").value;
 
-  fetch(`${API_URL}bestruns/${realm}/${name}`)
+  fetch(`${API_BASE_URL}/bestruns/${realm}/${name}`)
     .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -152,13 +182,10 @@ document.getElementById("apiForm").addEventListener("submit", function (event) {
       return response.json();
     })
     .then(data => {
-      console.log("RAW DATA:", data);
-
       renderBestRuns(data);
     })
     .catch(error => {
-      console.error("Error:", error);
-      document.getElementById("response").textContent =
-        "Failed to fetch data.";
+      const container = document.getElementById("response");
+      container.innerHTML = "<p>Unable to load character data. Please verify the character name and realm, then try again.</p>";
     });
 });

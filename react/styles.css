@@ -11,7 +11,7 @@ body {
 }
 
 .container {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -50,8 +50,15 @@ label {
 input {
   padding: 0.5rem;
   border-radius: 4px;
-  border: none;
+  border: 1px solid #334155;
   font-size: 1rem;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+input:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
 }
 
 button {
@@ -68,22 +75,78 @@ button:hover {
   background: #1d4ed8;
 }
 
-.run-card {
-  background: #020617;
-  padding: 1rem;
-  border-radius: 8px;
-}
-
-.run-header {
+.response {
   display: flex;
-  justify-content: space-between;
-  font-weight: bold;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.success {
+.response h2 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.response > p {
+  margin: -1rem 0 0;
+  color: #94a3b8;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #020617;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border: 1px solid #1e293b;
+  vertical-align: top;
+}
+
+th {
+  background: #111827;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+tbody tr:hover {
+  background: #0f172a;
+}
+
+td button {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+td h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1rem;
+}
+
+td ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+td div[hidden] {
+  display: none;
+}
+
+td div:not([hidden]) > table {
+  margin-top: 0.75rem;
+}
+
+.status-success {
   color: #22c55e;
+  font-weight: 600;
 }
 
-.fail {
+.status-fail {
   color: #ef4444;
+  font-weight: 600;
 }

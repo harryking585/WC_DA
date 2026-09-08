@@ -1,13 +1,8 @@
 import requests as r
-import pandas as pd
 import os
 from pathlib import Path
-import json
-from json import loads, dumps
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Optional
-import re
 app = FastAPI()
 
 
@@ -52,70 +47,6 @@ def grab_OAUTH_cred(client_id, key):
 
     return response
 
-
-# Takes unformatted_str and casts it to a dictionary using the json library
-# @return => python dictionary || None
-def str_to_dict(unformatted_str):
-    formatted_str = unformatted_str.replace('\'', '\"')
-
-    try:
-        json_dict = json.loads(formatted_str)
-    except:
-        print("ERROR: String does not fully represent a dictionary, assumming type 'None'")
-        return None
-    
-    
-    return json_dict
-
-def end_kvpair_index(strrow, start_index):
-    flags = 3 # indx0 = : encountered, indx1 = '1 encountered, indx2 = '2 encountered
-    start_index += 7
-    while(flags > 0):
-        char = strrow[start_index]
-
-        if(flags == 3 and char is ":"):
-            flags-=1
-        elif(flags <= 2 and char is "'"):
-            flags -=1
-
-        start_index += 1
-    return start_index
-
-
-
-def dfs_dataframe(dataframe):
-    keys = list(dataframe.keys())
-
-    for i in keys:
-        us_start = 0
-        us_stop = 0
-        cn_start = 0
-        cn_stop = 0
-        element_type = type(dataframe[i][0])
-        if(element_type is list or element_type is dict):   
-            for j in range(0, len(dataframe[i])): 
-                strcast_row = str(dataframe[i][j])
-                if("'en_US'" in strcast_row):
-                    for k in range(0, strcast_row.count("'zh_CN'")):
-                        us_start = strcast_row.find("'en_US'")
-                        cn_start = strcast_row.find("'zh_CN'")
-                        
-                        us_stop = end_kvpair_index(strcast_row, us_start)
-                        cn_stop = end_kvpair_index(strcast_row, cn_start)
-                        
-                        strcast_row = strcast_row[0:us_stop] + strcast_row[cn_stop:len(strcast_row)]
-                        dataframe[i][j] = str_to_dict(strcast_row)
-
-                else:
-                     break
-        else:
-            continue
-            
-
-
-
-    return dataframe
-    
 
 def get_dungeonpool(hostname, access_token):
     dungeon_pool = []
@@ -238,10 +169,9 @@ def format_mythicplus_data(mplus_json):
     }
 
 
-# Calls the mythic plus blizzard endpoint and formats the dataframe to ideal working state
-# @return => dataframe || -1
+# Retrieves the character's latest Mythic+ season data from Blizzard
+# and returns the formatted application response.
 def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vathren"):
-    df_list = []
     namespace = "profile-us"
     headers = {
         "Battlenet-Namespace": namespace,
@@ -263,7 +193,6 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
     for x in char_seasons:
         played_seasons.append(x['id'])
     current_season = max(played_seasons)
-    print(f"\n\nseasons list = {played_seasons}\n\n")
     i = 0
     
     hostname = ''
@@ -272,7 +201,6 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
             hostname = char_seasons[i]['key']['href']
             break
         i+=1
-    print(hostname)
     headers.pop("Battlenet-Namespace")
     try:
         response = r.get(
@@ -285,40 +213,7 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
     
     
     mplus_json = response.json()
-    # bestrun_df = pd.DataFrame(mplus_json['best_runs'])
-    os.makedirs('WC_DA/testdata', exist_ok=True)
-    blacklist_attr = ['_links', 'mythic_rating', 'character']
-    # bestrun_df.to_csv('WC_DA/testdata/raw_bestruns.csv')
-    for key in mplus_json.keys():
-        df = pd.DataFrame(mplus_json[key])
-        if key not in blacklist_attr:
-            df = dfs_dataframe(df)
-            res = df.to_json()
-            #parsed_df = loads(res)
-            #dfjson = dumps(parsed_df, indent=4)
-
-            #test regex expression
-            # res = re.find("[^(\\)]")
-            #end regex expression
-            df_list.append(res)
-            df.to_csv(f'WC_DA/testdata/raw_{key}.csv')
-            
-    print(type(mplus_json))
     return format_mythicplus_data(mplus_json)
-
-
-# Calls the Blizzard Achievements endpoint 
-# @return ; nil; pandas.DataFrame
-def getAchievements(namespace, access_token):
-
-    headers = {
-        "Battlenet-Namespace": namespace,
-        "Authorization": f"Bearer {access_token}",
-    }
-    endpoint = '/achievements'
-    
-    blacklist_attr=[]
-    return 0 
 
 # === FastAPI Endpoints ===
 
@@ -385,40 +280,3 @@ async def get_realms():
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
-# Purely for debugging purposes
-# hostname = "https://us.api.blizzard.com/"
-# envs = initialize_environmentals()
-# client_id = envs[0]
-# key = envs[1]
-# resp = grab_OAUTH_cred(client_id, key)
-# access_token = resp.json()['access_token']
-
-# print(f"!OAUTH Credentials Obtained")
-
-# get_dungeonpool(hostname, access_token)
-# print("woopa")
-
-# # ******** REALMS API CALL TESTING (SEQUENTIAL) ********
-# hostname = "https://us.api.blizzard.com/"
-# envs = initialize_environmentals()
-# client_id = envs[0]
-# key = envs[1]
-
-# resp = grab_OAUTH_cred(client_id, key)
-# access_token = resp.json()['access_token']
-# namespace = "dynamic-us"
-# headers = {
-#     "Battlenet-Namespace": namespace,
-#     "Authorization": f"Bearer {access_token}",
-# }
-
-# try:
-#     response = r.get(
-#         hostname+"data/wow/realm/index",
-#         headers
-#     )
-        
-#     print("complete")
-# except Exception as e:
-#     raise HTTPException(status_code=500, detail=str(e))
