@@ -157,6 +157,87 @@ def get_dungeonpool(hostname, access_token):
 
 
 
+def format_mythicplus_data(mplus_json):
+    best_runs = mplus_json.get("best_runs", [])
+    formatted_runs = []
+
+    for run in best_runs:
+        formatted_runs.append({
+            "dungeon": run.get("dungeon", {}).get("name", {}).get("en_US", "Unknown"),
+            "keystone_level": run.get("keystone_level", 0),
+            "completed_within_time": run.get("is_completed_within_time", False),
+            "duration_ms": run.get("duration", 0),
+            "duration_minutes": round(run.get("duration", 0) / 60000, 2),
+            "completed_timestamp": run.get("completed_timestamp"),
+            "affixes": [
+                affix.get("name", {}).get("en_US", "Unknown")
+                for affix in run.get("keystone_affixes", [])
+            ],
+            "members": [
+                {
+                    "name": member.get("character", {}).get("name", "Unknown"),
+                    "realm": member.get("character", {}).get("realm", {}).get("slug", "Unknown"),
+                    "specialization": member.get("specialization", {}).get("name", {}).get("en_US", "Unknown"),
+                    "race": member.get("race", {}).get("name", {}).get("en_US", "Unknown"),
+                    "item_level": member.get("equipped_item_level", 0)
+                }
+                for member in run.get("members", [])
+            ]
+        })
+
+    total_runs = len(formatted_runs)
+    timed_runs = sum(
+        1 for run in formatted_runs
+        if run["completed_within_time"]
+    )
+
+    if total_runs:
+        highest_key = max(run["keystone_level"] for run in formatted_runs)
+
+        average_key_level = round(
+            sum(run["keystone_level"] for run in formatted_runs) / total_runs,
+            2
+        )
+
+        average_duration_minutes = round(
+            sum(run["duration_minutes"] for run in formatted_runs) / total_runs,
+            2
+        )
+
+        timed_percentage = round(
+            (timed_runs / total_runs) * 100,
+            2
+        )
+    else:
+        highest_key = 0
+        average_key_level = 0
+        average_duration_minutes = 0
+        timed_percentage = 0
+
+    character = mplus_json.get("character", {})
+
+    return {
+        "character": {
+            "name": character.get("name", "Unknown"),
+            "realm": character.get("realm", {}).get("name", {}).get("en_US", "Unknown"),
+            "mythic_rating": round(
+                mplus_json.get("mythic_rating", {}).get("rating", 0),
+                2
+            ),
+            "season_id": mplus_json.get("season", {}).get("id")
+        },
+        "summary": {
+            "highest_key": highest_key,
+            "timed_runs": timed_runs,
+            "total_runs": total_runs,
+            "timed_percentage": timed_percentage,
+            "average_key_level": average_key_level,
+            "average_duration_minutes": average_duration_minutes
+        },
+        "best_runs": formatted_runs
+    }
+
+
 # Calls the mythic plus blizzard endpoint and formats the dataframe to ideal working state
 # @return => dataframe || -1
 def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vathren"):
@@ -184,6 +265,7 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
     current_season = max(played_seasons)
     print(f"\n\nseasons list = {played_seasons}\n\n")
     i = 0
+    
     hostname = ''
     while(i < len(char_seasons)):
         if(char_seasons[i]['id'] == current_season):
@@ -222,7 +304,7 @@ def get_mythicplus(hostname, access_token, realm="emerald-dream",char_name="vath
             df.to_csv(f'WC_DA/testdata/raw_{key}.csv')
             
     print(type(mplus_json))
-    return mplus_json
+    return format_mythicplus_data(mplus_json)
 
 
 # Calls the Blizzard Achievements endpoint 
@@ -256,7 +338,7 @@ async def get_dynamicmythicplus(realm, name):
         resp = grab_OAUTH_cred(client_id, key)
         access_token = resp.json()['access_token']
     
-        return json.dumps(get_mythicplus(hostname, access_token, realm.lower(), name.lower()))
+        return get_mythicplus(hostname, access_token, realm.lower(), name.lower())
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

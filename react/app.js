@@ -40,21 +40,54 @@ function createTable(headers, rows) {
   return table;
 }
 
+function renderSummary(data) {
+  const container = document.getElementById("response");
+
+  const character = data?.character;
+  const summary = data?.summary;
+
+  if (!character || !summary) {
+    return;
+  }
+
+  const heading = document.createElement("h2");
+  heading.textContent = `${character.name} - ${character.realm}`;
+
+  const rating = document.createElement("p");
+  rating.textContent = `Mythic+ Rating: ${character.mythic_rating}`;
+
+  const summaryTable = createTable(
+    [
+      "Highest Key",
+      "Timed Runs",
+      "Timed %",
+      "Average Key",
+      "Average Duration"
+    ],
+    [[
+      summary.highest_key,
+      `${summary.timed_runs} / ${summary.total_runs}`,
+      `${summary.timed_percentage}%`,
+      summary.average_key_level,
+      `${summary.average_duration_minutes} min`
+    ]]
+  );
+
+  container.appendChild(heading);
+  container.appendChild(rating);
+  container.appendChild(summaryTable);
+}
+
 function renderBestRuns(data) {
   const container = document.getElementById("response");
   container.innerHTML = "";
 
-  let runs = null;
+  renderSummary(data);
 
-  // Handle different possible shapes
-  if (Array.isArray(data)) {
-    runs = data;
-  } else if (data && Array.isArray(data.best_runs)) {
-    runs = data.best_runs;
-  }
+  const runs = data?.best_runs;
 
   if (!runs || !runs.length) {
-    container.innerHTML = "<p>No data available</p>";
+    container.innerHTML += "<p>No run data available</p>";
     return;
   }
 
@@ -68,26 +101,22 @@ function renderBestRuns(data) {
   ];
 
   const mainRows = runs.map(run => {
-    const dungeonName = run.dungeon?.name?.en_US || "Unknown";
-
-    const duration = (run.duration / 60000).toFixed(2);
-
-    const completed = run.is_completed_within_time ? "Yes" : "No";
+    const completed = run.completed_within_time ? "Yes" : "No";
 
     // Affixes table
-    const affixRows = run.keystone_affixes.map(a => [
-      a.name.en_US
+    const affixRows = run.affixes.map(affix => [
+      affix
     ]);
 
     const affixTable = createTable(["Affix"], affixRows);
 
     // Members table
-    const memberRows = run.members.map(m => [
-      m.character.name,
-      m.character.realm.slug,
-      m.specialization.name.en_US,
-      m.race.name.en_US,
-      m.equipped_item_level
+    const memberRows = run.members.map(member => [
+      member.name,
+      member.realm,
+      member.specialization,
+      member.race,
+      member.item_level
     ]);
 
     const memberTable = createTable(
@@ -96,10 +125,10 @@ function renderBestRuns(data) {
     );
 
     return [
-      dungeonName,
+      run.dungeon,
       run.keystone_level,
       completed,
-      duration,
+      run.duration_minutes.toFixed(2),
       affixTable,
       memberTable
     ];
@@ -124,13 +153,6 @@ document.getElementById("apiForm").addEventListener("submit", function (event) {
     })
     .then(data => {
       console.log("RAW DATA:", data);
-
-      
-      if (typeof data === "string") {
-        data = JSON.parse(data);
-      }
-
-      console.log("PARSED DATA:", data);
 
       renderBestRuns(data);
     })
