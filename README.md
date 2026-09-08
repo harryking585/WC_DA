@@ -8,6 +8,13 @@ and presents the results through a lightweight web interface.
 The project focuses on turning a large, deeply nested third-party API
 response into concise, useful information for an end user.
 
+## Demo
+
+![WC_DA Demo](assets/wc_da_demo.gif)
+
+**Character lookup → backend data transformation → calculated
+performance metrics → individual run details**
+
 ## Overview
 
 World of Warcraft's Mythic+ system consists of increasingly difficult
